@@ -1,19 +1,23 @@
-package com.shenbao.radiotest.radiotest;
+package com.shenbao.radiotest.radiotest.activity;
 
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.shenbao.radiotest.radiotest.Constant;
+import com.shenbao.radiotest.radiotest.utils.NetRequstUtils;
+import com.shenbao.radiotest.radiotest.R;
+import com.shenbao.radiotest.radiotest.javabean.RadioInfoEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView radioInfoListView;
     private static ArrayList<RadioInfoEntity> radioInfoEntities;
+
+    private static RadioInfoAdapter adapter;
+
     public static Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg)
@@ -30,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what){
                 case 1:
                     radioInfoEntities.addAll((Collection<? extends RadioInfoEntity>) msg.obj);
+                    adapter.notifyDataSetChanged();
+                    Log.i("MainActivity",""+radioInfoEntities.size());
                  break;
             }
         }
@@ -46,21 +55,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         radioInfoEntities = new ArrayList<>();
+        adapter = new RadioInfoAdapter();
         NetRequstUtils.getInstace().connectRequest(Constant.RadioUrl);
     }
 
     private void initView() {
         radioInfoListView = (ListView) findViewById(R.id.lv_radioList);
-        radioInfoListView.setAdapter(new RadioInfoAdapter());
+
+        radioInfoListView.setAdapter(adapter);
         radioInfoListView.setOnItemClickListener(new RadioInfoListener());
     }
 
     private class RadioInfoListener implements android.widget.AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            RadioInfoEntity infoEntity = radioInfoEntities.get(position);
+            RadioInfoEntity infoEntity = adapter.getItem(position);
+            Log.e("RadioInfoEntity",""+infoEntity.toString()+"\n"+infoEntity.getRadioEntityList().toString());
             Intent intent = new Intent(MainActivity.this,RadioActivity.class);
-            intent.putExtra("RadioArray",infoEntity.getRadioEntityList());
+//            intent.putExtra("hello","hello");
+//            intent.putExtra("RadioArray",infoEntity.getRadioEntityList());
+//            intent.putParcelableArrayListExtra("RadioArray", (ArrayList<? extends Parcelable>) infoEntity.getRadioEntityList());
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("RadioArray", infoEntity.getRadioEntityList());
+            intent.putExtra("bundle",bundle);
+            startActivity(intent);
         }
     }
 

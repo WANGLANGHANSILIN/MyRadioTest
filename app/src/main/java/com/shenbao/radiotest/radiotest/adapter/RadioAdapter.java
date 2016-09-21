@@ -1,4 +1,4 @@
-package com.shenbao.radiotest.radiotest;
+package com.shenbao.radiotest.radiotest.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -6,6 +6,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.shenbao.radiotest.radiotest.R;
+import com.shenbao.radiotest.radiotest.javabean.RadioEntity;
 
 import java.util.ArrayList;
 
@@ -37,7 +40,7 @@ public class RadioAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHodle hodle = null;
         if (convertView == null){
-            convertView = View.inflate(context,R.layout.lv_radionnfoitem,null);
+            convertView = View.inflate(context, R.layout.lv_radionnfoitem,null);
             hodle = new ViewHodle();
             hodle.imageView = (ImageView) convertView.findViewById(R.id.iv_radio_icon);
             hodle.textView = (TextView) convertView.findViewById(R.id.tv_radioname);

@@ -1,11 +1,7 @@
-package com.shenbao.radiotest.radiotest;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package com.shenbao.radiotest.radiotest.javabean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by wangl on 2016/9/19 0019.

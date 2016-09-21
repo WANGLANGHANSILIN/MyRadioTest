@@ -1,17 +1,18 @@
-package com.shenbao.radiotest.radiotest;
+package com.shenbao.radiotest.radiotest.utils;
 
 import android.os.Message;
 import android.util.Log;
+
+import com.shenbao.radiotest.radiotest.activity.MainActivity;
+import com.shenbao.radiotest.radiotest.javabean.RadioEntity;
+import com.shenbao.radiotest.radiotest.javabean.RadioInfoEntity;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class NetRequstUtils {
             try {
 //                radioInfoEntities.addAll();
                 ArrayList<RadioInfoEntity> infoEntityArrayList = requestNet(url);
+
+                Log.i("ArrayList",""+infoEntityArrayList.size());
+
                 if (infoEntityArrayList != null)
                 {
                     Message message = Message.obtain();
@@ -66,20 +70,20 @@ public class NetRequstUtils {
                 e.printStackTrace();
             }
         }
-        public ArrayList<RadioInfoEntity> getRadioInfoEntities()
-        {
-            if (radioInfoEntities == null)
-            {
-                try {
-                    radioInfoEntities.addAll(requestNet(url));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
-            }
-            return radioInfoEntities;
-        }
+//        public ArrayList<RadioInfoEntity> getRadioInfoEntities()
+//        {
+//            if (radioInfoEntities == null)
+//            {
+//                try {
+//                    radioInfoEntities.addAll(requestNet(url));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (XmlPullParserException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return radioInfoEntities;
+//        }
     }
 
     private ArrayList<RadioInfoEntity> requestNet(String url) throws IOException, XmlPullParserException
@@ -87,7 +91,7 @@ public class NetRequstUtils {
         URL url1 = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) url1.openConnection();
         connection.setConnectTimeout(8000);
-        connection.setRequestMethod("get");
+        connection.setRequestMethod("GET");
         ArrayList<RadioInfoEntity> infoEntityArrayList = new ArrayList<>();
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
         {
@@ -103,10 +107,11 @@ public class NetRequstUtils {
 //                writer.write(line);
 //            }
 //            测试代码
-            // TODO: 2016/9/20 0020 功能还有待加强 
+            // TODO: 2016/9/20 0020 功能还有待加强
 
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser pullParser = factory.newPullParser();
+            pullParser.setInput(stream,"utf-8");
             int eventType = pullParser.getEventType();
             Log.i("RadioEntity","eventType:"+eventType+"<<<---");
             while (XmlPullParser.END_DOCUMENT != eventType)
@@ -125,15 +130,18 @@ public class NetRequstUtils {
                         infoEntity.setRadioCount(RadioCount);
                         infoEntity.setRadioBelongs(pullParser.getAttributeValue(2));
                         Log.i("RadioEntity"  ,"RadioInfoEntity--->"+  infoEntity.toString());
-                        eventType = pullParser.getEventType();
-                        Log.i("RadioEntity","eventType:"+eventType+"---");
-                        if (eventType == XmlPullParser.START_TAG)
+
+                        for (int i = 0; i < Integer.valueOf(RadioCount); i++)
                         {
-                            pullParserName = pullParser.getName();
-                            Log.i("RadioEntity","pullParserName:"+pullParserName+"---");
-                            if (pullParserName.equals("Radio"))
+                            do{
+                                eventType =  pullParser.next();
+                            }while(eventType != XmlPullParser.START_TAG);
+
+                            if (eventType == XmlPullParser.START_TAG)
                             {
-                                for (int i = 0; i < Integer.valueOf(RadioCount); i++)
+                                pullParserName = pullParser.getName();
+                                Log.i("RadioEntity", "pullParserName:" + pullParserName + "---");
+                                if (pullParserName.equals("Radio"))
                                 {
                                     RadioEntity radioEntity = new RadioEntity();
                                     radioEntity.setRadioName(pullParser.getAttributeValue(0));
@@ -146,7 +154,7 @@ public class NetRequstUtils {
                         infoEntityArrayList.add(infoEntity);
                     }
                 }
-                pullParser.next();
+                eventType = pullParser.next();
             }
         }
         return infoEntityArrayList;

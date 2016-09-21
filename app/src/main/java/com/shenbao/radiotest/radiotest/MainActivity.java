@@ -16,11 +16,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView radioInfoListView;
-    private ArrayList<RadioInfoEntity> radioInfoEntities;
+    private static ArrayList<RadioInfoEntity> radioInfoEntities;
     public static Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg)
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-                    msg.obj;
+                    radioInfoEntities.addAll((Collection<? extends RadioInfoEntity>) msg.obj);
                  break;
             }
         }
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         radioInfoEntities = new ArrayList<>();
-        radioInfoEntities.addAll(NetRequstUtils.getInstace().connectRequest(Constant.RadioUrl));
+        NetRequstUtils.getInstace().connectRequest(Constant.RadioUrl);
     }
 
     private void initView() {
